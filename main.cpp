@@ -205,21 +205,66 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
         }
 
         int op = -1, type = -1;
-        if (inst.opcode == "add") { op = 0; type = 0; }
-        else if (inst.opcode == "sub") { op = 1; type = 0; }
-        else if (inst.opcode == "slt") { op = 2; type = 0; }
-        else if (inst.opcode == "or") { op = 3; type = 0; }
-        else if (inst.opcode == "nand") { op = 4; type = 0; }
-        else if (inst.opcode == "addi") { op = 5; type = 1; }
-        else if (inst.opcode == "slti") { op = 6; type = 1; }
-        else if (inst.opcode == "ori") { op = 7; type = 1; }
-        else if (inst.opcode == "lui") { op = 8; type = 1; }
-        else if (inst.opcode == "lw") { op = 9; type = 1; }
-        else if (inst.opcode == "sw") { op = 10; type = 1; }
-        else if (inst.opcode == "beq") { op = 11; type = 1; }
-        else if (inst.opcode == "jalr") { op = 12; type = 1; }
-        else if (inst.opcode == "j") { op = 13; type = 2; }
-        else if (inst.opcode == "halt") { op = 14; type = 2; }
+        if (inst.opcode == "add") {
+            op = 0;
+            type = 0;
+        }
+        else if (inst.opcode == "sub") {
+            op = 1;
+            type = 0;
+        }
+        else if (inst.opcode == "slt") {
+            op = 2;
+            type = 0;
+        }
+        else if (inst.opcode == "or") {
+            op = 3;
+            type = 0;
+        }
+        else if (inst.opcode == "nand") {
+            op = 4;
+            type = 0;
+        }
+        else if (inst.opcode == "addi") {
+            op = 5;
+            type = 1;
+        }
+        else if (inst.opcode == "slti") {
+            op = 6;
+            type = 1;
+        }
+        else if (inst.opcode == "ori") {
+            op = 7;
+            type = 1;
+        }
+        else if (inst.opcode == "lui") {
+            op = 8;
+            type = 1;
+        }
+        else if (inst.opcode == "lw") {
+            op = 9;
+            type = 1;
+        }
+        else if (inst.opcode == "sw") {
+            op = 10;
+            type = 1;
+        }
+        else if (inst.opcode == "beq") {
+            op = 11;
+            type = 1;
+        }
+        else if (inst.opcode == "jalr") {
+            op = 12;
+            type = 1;
+        }
+        else if (inst.opcode == "j") {
+            op = 13;
+            type = 2;
+        }
+        else if (inst.opcode == "halt") {
+            op = 14;
+            type = 2;
+        }
         else {
             exit(1);
         }
@@ -299,19 +344,19 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
     }
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     if (argc != 3) {
         cerr << "Usage: " << argv[0] << " input.asm output.obj" << endl;
         exit(1);
     }
 
-    FILE* fin = fopen(argv[1], "r");
+    FILE *fin = fopen(argv[1], "r");
     if (!fin) {
         cerr << "Error: Cannot open input file: " << argv[1] << endl;
         exit(1);
     }
 
-    FILE* fout = fopen(argv[2], "w");
+    FILE *fout = fopen(argv[2], "w");
     if (!fout) {
         cerr << "Error: Cannot create output file: " << argv[2] << endl;
         fclose(fin);
@@ -319,7 +364,7 @@ int main(int argc, char* argv[]) {
     }
 
     int symLen = findSymTabLen(fin);
-    struct symbolTable* symT = (struct symbolTable*)malloc(symLen * sizeof(struct symbolTable));
+    struct symbolTable *symT = (struct symbolTable *) malloc(symLen * sizeof(struct symbolTable));
     if (symLen > 0 && !symT) {
         cerr << "Error: Memory allocation failed" << endl;
         fclose(fin);
