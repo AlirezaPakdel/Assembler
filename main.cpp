@@ -126,6 +126,41 @@ int findSymTabLen(FILE *inputFile) {
     return count;
 }
 
+int fillSymTab(struct symbolTable *symT, FILE *inputFile) {
+    int pc = 0;
+    int idx = 0;
+    char buffer[256];
+    while (fgets(buffer, sizeof(buffer), inputFile)) {
+        string line(buffer);
+        Instruction inst = parse_line(line);
+
+        if (inst.opcode.empty() && inst.label.empty()) continue;
+
+        if (!inst.label.empty()) {
+            for(int i = 0; i < idx; i++) {
+                if (string(symT[i].name) == inst.label) {
+                    exit(1);
+                }
+            }
+            strncpy(symT[idx].name, inst.label.c_str(), 6);
+            symT[idx].name[6] = '\0';
+            symT[idx].address = pc;
+            idx++;
+        }
+
+        if (inst.opcode == ".space") {
+            if (inst.arg_count == 0 || !is_numeric(inst.args[0])) {
+                exit(1);
+            }
+            pc += stoi(inst.args[0]);
+        } else if (!inst.opcode.empty()) {
+            pc++;
+        }
+    }
+    rewind(inputFile);
+    return idx;
+}
+
 int main(int argc, char* argv[]) {
     if (argc != 3) {
         cerr << "Usage: " << argv[0] << " input.asm output.obj" << endl;
