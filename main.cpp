@@ -132,6 +132,27 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    cout << "Assembler started..." << endl;
+    FILE* fin = fopen(argv[1], "r");
+    if (!fin) {
+        cerr << "Error: Cannot open input file: " << argv[1] << endl;
+        exit(1);
+    }
+
+    int symLen = findSymTabLen(fin);
+    struct symbolTable* symT = (struct symbolTable*)malloc(symLen * sizeof(struct symbolTable));
+    if (symLen > 0 && !symT) {
+        cerr << "Error: Memory allocation failed" << endl;
+        fclose(fin);
+        exit(1);
+    }
+
+    fillSymTab(symT, fin);
+
+    for (int i = 0; i < symLen; i++) {
+        cout << "Symbol: " << symT[i].name << " Address: " << symT[i].address << endl;
+    }
+
+    free(symT);
+    fclose(fin);
     return 0;
 }
