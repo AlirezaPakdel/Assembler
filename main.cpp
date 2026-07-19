@@ -17,19 +17,19 @@ struct Instruction {
     int arg_count;
 };
 
-bool is_numeric(const string& str) {
+bool is_numeric(const string &str) {
     if (str.empty()) return false;
-    size_t start ;
-    if (str[0] == '-' || str[0] == '+'){
-        start =1;
-    }else{
-        start =0;
+    size_t start;
+    if (str[0] == '-' || str[0] == '+') {
+        start = 1;
+    } else {
+        start = 0;
     }
-    if (start == str.length()){
+    if (start == str.length()) {
         return false;
     }
     for (size_t i = start; i < str.length(); ++i) {
-        if (!isdigit(static_cast<unsigned char>(str[i]))){
+        if (!isdigit(static_cast<unsigned char>(str[i]))) {
             return false;
         }
     }
@@ -41,10 +41,10 @@ void int2hex16(char *lower, int a) {
 }
 
 int hex2int(char *hex) {
-    return (int)strtol(hex, NULL, 16);
+    return (int) strtol(hex, NULL, 16);
 }
 
-Instruction parse_line(const string& line) {
+Instruction parse_line(const string &line) {
     Instruction inst;
     inst.arg_count = 0;
 
@@ -74,10 +74,10 @@ Instruction parse_line(const string& line) {
     char line_copy[256];
     strcpy(line_copy, clean.c_str());
 
-    char* tokens[6];
+    char *tokens[6];
     int t_cnt = 0;
 
-    char* token = strtok(line_copy, " \t");
+    char *token = strtok(line_copy, " \t");
     while (token != NULL && t_cnt < 6) {
         tokens[t_cnt++] = token;
         token = strtok(NULL, " \t");
@@ -85,7 +85,8 @@ Instruction parse_line(const string& line) {
 
     if (t_cnt == 0) return inst;
 
-    string ops[] = {"add","sub","slt","or","nand","addi","slti","ori","lui","lw","sw","beq","jalr","j","halt",".fill",".space"};
+    string ops[] = {"add", "sub", "slt", "or", "nand", "addi", "slti", "ori", "lui", "lw", "sw", "beq", "jalr", "j",
+                    "halt", ".fill", ".space"};
 
     bool is_op = false;
     for (int i = 0; i < 17; ++i) {
@@ -137,7 +138,7 @@ int fillSymTab(struct symbolTable *symT, FILE *inputFile) {
         if (inst.opcode.empty() && inst.label.empty()) continue;
 
         if (!inst.label.empty()) {
-            for(int i = 0; i < idx; i++) {
+            for (int i = 0; i < idx; i++) {
                 if (string(symT[i].name) == inst.label) {
                     exit(1);
                 }
@@ -161,7 +162,7 @@ int fillSymTab(struct symbolTable *symT, FILE *inputFile) {
     return idx;
 }
 
-int get_symbol_address(struct symbolTable *symT, int len, const string& name) {
+int get_symbol_address(struct symbolTable *symT, int len, const string &name) {
     for (int i = 0; i < len; ++i) {
         if (string(symT[i].name) == name) {
             return symT[i].address;
@@ -204,18 +205,47 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
         }
 
         int op = -1, type = -1;
-        if (inst.opcode == "add") { op = 0; type = 0; }
-        else if (inst.opcode == "sub") { op = 1; type = 0; }
-        else if (inst.opcode == "slt") { op = 2; type = 0; }
-        else if (inst.opcode == "or") { op = 3; type = 0; }
-        else if (inst.opcode == "nand") { op = 4; type = 0; }
-        else if (inst.opcode == "addi") { op = 5; type = 1; }
-        else if (inst.opcode == "slti") { op = 6; type = 1; }
-        else if (inst.opcode == "ori") { op = 7; type = 1; }
-        else if (inst.opcode == "lui") { op = 8; type = 1; }
-        else if (inst.opcode == "lw") { op = 9; type = 1; }
-        else if (inst.opcode == "sw") { op = 10; type = 1; }
-        else if (inst.opcode == "beq") { op = 11; type = 1; }
+        if (inst.opcode == "add") {
+            op = 0;
+            type = 0;
+        } else if (inst.opcode == "sub") {
+            op = 1;
+            type = 0;
+        } else if (inst.opcode == "slt") {
+            op = 2;
+            type = 0;
+        } else if (inst.opcode == "or") {
+            op = 3;
+            type = 0;
+        } else if (inst.opcode == "nand") {
+            op = 4;
+            type = 0;
+        } else if (inst.opcode == "addi") {
+            op = 5;
+            type = 1;
+        } else if (inst.opcode == "slti") {
+            op = 6;
+            type = 1;
+        } else if (inst.opcode == "ori") {
+            op = 7;
+            type = 1;
+        } else if (inst.opcode == "lui") {
+            op = 8;
+            type = 1;
+        } else if (inst.opcode == "lw") {
+            op = 9;
+            type = 1;
+        } else if (inst.opcode == "sw") {
+            op = 10;
+            type = 1;
+        } else if (inst.opcode == "beq") {
+            op = 11;
+            type = 1;
+        } else if (inst.opcode == "jalr") {
+            op = 12;
+            type = 1;
+        }
+
 
         if (type == 0) {
             if (inst.arg_count < 3) exit(1);
@@ -227,7 +257,7 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
             int machine_code = hex2int(hex_str);
             fprintf(outputFile, "%d\n", machine_code);
             pc++;
-        }else if (type == 1) {
+        } else if (type == 1) {
             int rt = stoi(inst.args[0]);
             int rs = 0;
             int offset = 0;
@@ -239,6 +269,11 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
                     offset = get_symbol_address(symT, symLen, inst.args[1]);
                     if (offset == -1) exit(1);
                 }
+            } else if (inst.opcode == "jalr") {
+                if (inst.arg_count >= 2) {
+                    rs = stoi(inst.args[1]);
+                }
+                offset = 0;
             } else {
                 if (inst.arg_count < 3) exit(1);
                 rs = stoi(inst.args[1]);
@@ -270,20 +305,20 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
     }
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     if (argc != 3) {
         cerr << "Usage: " << argv[0] << " input.asm output.obj" << endl;
         exit(1);
     }
 
-    FILE* fin = fopen(argv[1], "r");
+    FILE *fin = fopen(argv[1], "r");
     if (!fin) {
         cerr << "Error: Cannot open input file: " << argv[1] << endl;
         exit(1);
     }
 
     int symLen = findSymTabLen(fin);
-    struct symbolTable* symT = (struct symbolTable*)malloc(symLen * sizeof(struct symbolTable));
+    struct symbolTable *symT = (struct symbolTable *) malloc(symLen * sizeof(struct symbolTable));
     if (symLen > 0 && !symT) {
         cerr << "Error: Memory allocation failed" << endl;
         fclose(fin);
