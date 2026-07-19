@@ -244,6 +244,13 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
         } else if (inst.opcode == "jalr") {
             op = 12;
             type = 1;
+        } else if (inst.opcode == "j") {
+            op = 13;
+            type = 2;
+        }
+        else if (inst.opcode == "halt") {
+            op = 14;
+            type = 2;
         }
 
 
@@ -295,6 +302,24 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
             int2hex16(lower, offset);
             char hex_str[9];
             sprintf(hex_str, "0%X%X%X%s", op, rs, rt, lower);
+            int machine_code = hex2int(hex_str);
+            fprintf(outputFile, "%d\n", machine_code);
+            pc++;
+        } else if (type == 2) {
+            int offset = 0;
+            if (inst.opcode != "halt") {
+                if (inst.arg_count == 0) exit(1);
+                if (is_numeric(inst.args[0])) {
+                    offset = stoi(inst.args[0]);
+                } else {
+                    offset = get_symbol_address(symT, symLen, inst.args[0]);
+                    if (offset == -1) exit(1);
+                }
+            }
+            char lower[5];
+            int2hex16(lower, offset);
+            char hex_str[9];
+            sprintf(hex_str, "0%X00%s", op, lower);
             int machine_code = hex2int(hex_str);
             fprintf(outputFile, "%d\n", machine_code);
             pc++;
