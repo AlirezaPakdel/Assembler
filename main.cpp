@@ -330,33 +330,41 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
     }
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     if (argc != 3) {
         cerr << "Usage: " << argv[0] << " input.asm output.obj" << endl;
         exit(1);
     }
 
-    FILE *fin = fopen(argv[1], "r");
+    FILE* fin = fopen(argv[1], "r");
     if (!fin) {
         cerr << "Error: Cannot open input file: " << argv[1] << endl;
         exit(1);
     }
 
-    int symLen = findSymTabLen(fin);
-    struct symbolTable *symT = (struct symbolTable *) malloc(symLen * sizeof(struct symbolTable));
-    if (symLen > 0 && !symT) {
-        cerr << "Error: Memory allocation failed" << endl;
+    FILE* fout = fopen(argv[2], "w");
+    if (!fout) {
+        cerr << "Error: Cannot create output file: " << argv[2] << endl;
         fclose(fin);
         exit(1);
     }
 
-    fillSymTab(symT, fin);
-
-    for (int i = 0; i < symLen; i++) {
-        cout << "Symbol: " << symT[i].name << " Address: " << symT[i].address << endl;
+    int symLen = findSymTabLen(fin);
+    struct symbolTable* symT = (struct symbolTable*)malloc(symLen * sizeof(struct symbolTable));
+    if (symLen > 0 && !symT) {
+        cerr << "Error: Memory allocation failed" << endl;
+        fclose(fin);
+        fclose(fout);
+        exit(1);
     }
+
+    fillSymTab(symT, fin);
+    pass2(fin, fout, symT, symLen);
 
     free(symT);
     fclose(fin);
+    fclose(fout);
+
+    cout << "Assembly completed successfully!" << endl;
     return 0;
 }
