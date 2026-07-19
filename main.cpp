@@ -205,66 +205,38 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
         }
 
         int op = -1, type = -1;
-        if (inst.opcode == "add") {
-            op = 0;
-            type = 0;
-        } else if (inst.opcode == "sub") {
-            op = 1;
-            type = 0;
-        } else if (inst.opcode == "slt") {
-            op = 2;
-            type = 0;
-        } else if (inst.opcode == "or") {
-            op = 3;
-            type = 0;
-        } else if (inst.opcode == "nand") {
-            op = 4;
-            type = 0;
-        } else if (inst.opcode == "addi") {
-            op = 5;
-            type = 1;
-        } else if (inst.opcode == "slti") {
-            op = 6;
-            type = 1;
-        } else if (inst.opcode == "ori") {
-            op = 7;
-            type = 1;
-        } else if (inst.opcode == "lui") {
-            op = 8;
-            type = 1;
-        } else if (inst.opcode == "lw") {
-            op = 9;
-            type = 1;
-        } else if (inst.opcode == "sw") {
-            op = 10;
-            type = 1;
-        } else if (inst.opcode == "beq") {
-            op = 11;
-            type = 1;
-        } else if (inst.opcode == "jalr") {
-            op = 12;
-            type = 1;
-        } else if (inst.opcode == "j") {
-            op = 13;
-            type = 2;
-        }
-        else if (inst.opcode == "halt") {
-            op = 14;
-            type = 2;
+        if (inst.opcode == "add") { op = 0; type = 0; }
+        else if (inst.opcode == "sub") { op = 1; type = 0; }
+        else if (inst.opcode == "slt") { op = 2; type = 0; }
+        else if (inst.opcode == "or") { op = 3; type = 0; }
+        else if (inst.opcode == "nand") { op = 4; type = 0; }
+        else if (inst.opcode == "addi") { op = 5; type = 1; }
+        else if (inst.opcode == "slti") { op = 6; type = 1; }
+        else if (inst.opcode == "ori") { op = 7; type = 1; }
+        else if (inst.opcode == "lui") { op = 8; type = 1; }
+        else if (inst.opcode == "lw") { op = 9; type = 1; }
+        else if (inst.opcode == "sw") { op = 10; type = 1; }
+        else if (inst.opcode == "beq") { op = 11; type = 1; }
+        else if (inst.opcode == "jalr") { op = 12; type = 1; }
+        else if (inst.opcode == "j") { op = 13; type = 2; }
+        else if (inst.opcode == "halt") { op = 14; type = 2; }
+        else {
+            exit(1);
         }
 
+        char hex_str[9] = "00000000";
 
         if (type == 0) {
             if (inst.arg_count < 3) exit(1);
             int rd = stoi(inst.args[0]);
             int rs = stoi(inst.args[1]);
             int rt = stoi(inst.args[2]);
-            char hex_str[9];
             sprintf(hex_str, "0%X%X%X%X000", op, rs, rt, rd);
             int machine_code = hex2int(hex_str);
             fprintf(outputFile, "%d\n", machine_code);
             pc++;
         } else if (type == 1) {
+            if (inst.arg_count < 2 && inst.opcode != "jalr") exit(1);
             int rt = stoi(inst.args[0]);
             int rs = 0;
             int offset = 0;
@@ -298,9 +270,9 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
                 }
             }
 
+            if (offset < -32768 || offset > 65535) exit(1);
             char lower[5];
             int2hex16(lower, offset);
-            char hex_str[9];
             sprintf(hex_str, "0%X%X%X%s", op, rs, rt, lower);
             int machine_code = hex2int(hex_str);
             fprintf(outputFile, "%d\n", machine_code);
@@ -315,18 +287,15 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
                     offset = get_symbol_address(symT, symLen, inst.args[0]);
                     if (offset == -1) exit(1);
                 }
+                if (offset < -32768 || offset > 65535) exit(1);
             }
             char lower[5];
             int2hex16(lower, offset);
-            char hex_str[9];
             sprintf(hex_str, "0%X00%s", op, lower);
             int machine_code = hex2int(hex_str);
             fprintf(outputFile, "%d\n", machine_code);
             pc++;
         }
-
-
-        pc++;
     }
 }
 
