@@ -2,8 +2,7 @@ using namespace std;
 
 #include <iostream>
 #include <string>
-
-
+#include <cstring>
 
 
 struct symbolTable {
@@ -45,9 +44,84 @@ int hex2int(char *hex) {
     return (int)strtol(hex, NULL, 16);
 }
 
+Instruction parse_line(const string& line) {
+    Instruction inst;
+    inst.arg_count = 0;
 
-int main() {
+    size_t comment_pos = line.find('#');
+    string clean;
+    if (comment_pos != string::npos) {
+        clean = line.substr(0, comment_pos);
+    } else {
+        clean = line;
+    }
+
+    size_t start = clean.find_first_not_of(" \t\n\r");
+    if (start == string::npos) {
+        return inst;
+    }
+    clean = clean.substr(start);
+
+    size_t end = clean.find_last_not_of(" \t\n\r");
+    if (end != string::npos) {
+        clean = clean.substr(0, end + 1);
+    }
+
+    for (size_t i = 0; i < clean.length(); ++i) {
+        if (clean[i] == ',') clean[i] = ' ';
+    }
+
+    char line_copy[256];
+    strcpy(line_copy, clean.c_str());
+
+    char* tokens[6];
+    int t_cnt = 0;
+
+    char* token = strtok(line_copy, " \t");
+    while (token != NULL && t_cnt < 6) {
+        tokens[t_cnt++] = token;
+        token = strtok(NULL, " \t");
+    }
+
+    if (t_cnt == 0) return inst;
+
+    string ops[] = {"add","sub","slt","or","nand","addi","slti","ori","lui","lw","sw","beq","jalr","j","halt",".fill",".space"};
+
+    bool is_op = false;
+    for (int i = 0; i < 17; ++i) {
+        if (string(tokens[0]) == ops[i]) {
+            is_op = true;
+            break;
+        }
+    }
+
+    int arg_start = 0;
+    if (is_op) {
+        inst.opcode = tokens[0];
+        arg_start = 1;
+    } else {
+        inst.label = tokens[0];
+        if (t_cnt > 1) {
+            inst.opcode = tokens[1];
+            arg_start = 2;
+        }
+    }
+
+    for (int i = arg_start; i < t_cnt && inst.arg_count < 3; ++i) {
+        inst.args[inst.arg_count++] = tokens[i];
+    }
+
+    return inst;
+}
 
 
+
+int main(int argc, char* argv[]) {
+    if (argc != 3) {
+        cerr << "Usage: " << argv[0] << " input.asm output.obj" << endl;
+        exit(1);
+    }
+
+    cout << "Assembler started..." << endl;
     return 0;
 }
