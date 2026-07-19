@@ -203,6 +203,25 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
             continue;
         }
 
+        int op = -1, type = -1;
+        if (inst.opcode == "add") { op = 0; type = 0; }
+        else if (inst.opcode == "sub") { op = 1; type = 0; }
+        else if (inst.opcode == "slt") { op = 2; type = 0; }
+        else if (inst.opcode == "or") { op = 3; type = 0; }
+        else if (inst.opcode == "nand") { op = 4; type = 0; }
+
+        if (type == 0) {
+            if (inst.arg_count < 3) exit(1);
+            int rd = stoi(inst.args[0]);
+            int rs = stoi(inst.args[1]);
+            int rt = stoi(inst.args[2]);
+            char hex_str[9];
+            sprintf(hex_str, "0%X%X%X%X000", op, rs, rt, rd);
+            int machine_code = hex2int(hex_str);
+            fprintf(outputFile, "%d\n", machine_code);
+            pc++;
+        }
+
         pc++;
     }
 }
