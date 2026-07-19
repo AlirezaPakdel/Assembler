@@ -170,6 +170,43 @@ int get_symbol_address(struct symbolTable *symT, int len, const string& name) {
     return -1;
 }
 
+void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symLen) {
+    char buffer[256];
+    int pc = 0;
+
+    while (fgets(buffer, sizeof(buffer), inputFile)) {
+        string line(buffer);
+        Instruction inst = parse_line(line);
+
+        if (inst.opcode.empty() && inst.label.empty()) continue;
+        if (inst.opcode.empty()) continue;
+
+        if (inst.opcode == ".space") {
+            int spaces = stoi(inst.args[0]);
+            for (int i = 0; i < spaces; i++) {
+                fprintf(outputFile, "0\n");
+            }
+            pc += spaces;
+            continue;
+        }
+
+        if (inst.opcode == ".fill") {
+            int val;
+            if (is_numeric(inst.args[0])) {
+                val = stoi(inst.args[0]);
+            } else {
+                val = get_symbol_address(symT, symLen, inst.args[0]);
+                if (val == -1) exit(1);
+            }
+            fprintf(outputFile, "%d\n", val);
+            pc++;
+            continue;
+        }
+
+        pc++;
+    }
+}
+
 int main(int argc, char* argv[]) {
     if (argc != 3) {
         cerr << "Usage: " << argv[0] << " input.asm output.obj" << endl;
