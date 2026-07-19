@@ -209,6 +209,11 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
         else if (inst.opcode == "slt") { op = 2; type = 0; }
         else if (inst.opcode == "or") { op = 3; type = 0; }
         else if (inst.opcode == "nand") { op = 4; type = 0; }
+        else if (inst.opcode == "addi") { op = 5; type = 1; }
+        else if (inst.opcode == "slti") { op = 6; type = 1; }
+        else if (inst.opcode == "ori") { op = 7; type = 1; }
+        else if (inst.opcode == "lui") { op = 8; type = 1; }
+
 
         if (type == 0) {
             if (inst.arg_count < 3) exit(1);
@@ -220,7 +225,37 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
             int machine_code = hex2int(hex_str);
             fprintf(outputFile, "%d\n", machine_code);
             pc++;
+        }else if (type == 1) {
+            int rt = stoi(inst.args[0]);
+            int rs = 0;
+            int offset = 0;
+
+            if (inst.opcode == "lui") {
+                if (is_numeric(inst.args[1])) {
+                    offset = stoi(inst.args[1]);
+                } else {
+                    offset = get_symbol_address(symT, symLen, inst.args[1]);
+                    if (offset == -1) exit(1);
+                }
+            } else {
+                if (inst.arg_count < 3) exit(1);
+                rs = stoi(inst.args[1]);
+                if (is_numeric(inst.args[2])) {
+                    offset = stoi(inst.args[2]);
+                } else {
+                    exit(1);
+                }
+            }
+
+            char lower[5];
+            int2hex16(lower, offset);
+            char hex_str[9];
+            sprintf(hex_str, "0%X%X%X%s", op, rs, rt, lower);
+            int machine_code = hex2int(hex_str);
+            fprintf(outputFile, "%d\n", machine_code);
+            pc++;
         }
+
 
         pc++;
     }
