@@ -114,7 +114,17 @@ Instruction parse_line(const string& line) {
     return inst;
 }
 
-
+int findSymTabLen(FILE *inputFile) {
+    int count = 0;
+    char buffer[256];
+    while (fgets(buffer, sizeof(buffer), inputFile)) {
+        string line(buffer);
+        Instruction inst = parse_line(line);
+        if (!inst.label.empty()) count++;
+    }
+    rewind(inputFile);
+    return count;
+}
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {
