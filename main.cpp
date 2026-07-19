@@ -213,7 +213,9 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
         else if (inst.opcode == "slti") { op = 6; type = 1; }
         else if (inst.opcode == "ori") { op = 7; type = 1; }
         else if (inst.opcode == "lui") { op = 8; type = 1; }
-
+        else if (inst.opcode == "lw") { op = 9; type = 1; }
+        else if (inst.opcode == "sw") { op = 10; type = 1; }
+        else if (inst.opcode == "beq") { op = 11; type = 1; }
 
         if (type == 0) {
             if (inst.arg_count < 3) exit(1);
@@ -240,10 +242,17 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
             } else {
                 if (inst.arg_count < 3) exit(1);
                 rs = stoi(inst.args[1]);
-                if (is_numeric(inst.args[2])) {
-                    offset = stoi(inst.args[2]);
+                string target = inst.args[2];
+                if (is_numeric(target)) {
+                    offset = stoi(target);
                 } else {
-                    exit(1);
+                    int addr = get_symbol_address(symT, symLen, target);
+                    if (addr == -1) exit(1);
+                    if (inst.opcode == "beq") {
+                        offset = addr - pc - 1;
+                    } else {
+                        offset = addr;
+                    }
                 }
             }
 
