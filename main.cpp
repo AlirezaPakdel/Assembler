@@ -161,6 +161,15 @@ int fillSymTab(struct symbolTable *symT, FILE *inputFile) {
     return idx;
 }
 
+int get_symbol_address(struct symbolTable *symT, int len, const string& name) {
+    for (int i = 0; i < len; ++i) {
+        if (string(symT[i].name) == name) {
+            return symT[i].address;
+        }
+    }
+    return -1;
+}
+
 int main(int argc, char* argv[]) {
     if (argc != 3) {
         cerr << "Usage: " << argv[0] << " input.asm output.obj" << endl;
