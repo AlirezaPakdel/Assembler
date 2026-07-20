@@ -19,17 +19,15 @@ struct Instruction {
 
 bool is_numeric(const string &str) {
     if (str.empty()) return false;
-    size_t start;
-    if (str[0] == '-' || str[0] == '+') {
+    int start = 0;
+    if (str[0] == '-') {
         start = 1;
-    } else {
-        start = 0;
+        if (str.length() == start) {
+            return false;
+        }
     }
-    if (start == str.length()) {
-        return false;
-    }
-    for (size_t i = start; i < str.length(); ++i) {
-        if (!isdigit(static_cast<unsigned char>(str[i]))) {
+    for (int i = start; i < str.length(); ++i) {
+        if (!isdigit(str[i])) {
             return false;
         }
     }
@@ -208,64 +206,49 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
         if (inst.opcode == "add") {
             op = 0;
             type = 0;
-        }
-        else if (inst.opcode == "sub") {
+        } else if (inst.opcode == "sub") {
             op = 1;
             type = 0;
-        }
-        else if (inst.opcode == "slt") {
+        } else if (inst.opcode == "slt") {
             op = 2;
             type = 0;
-        }
-        else if (inst.opcode == "or") {
+        } else if (inst.opcode == "or") {
             op = 3;
             type = 0;
-        }
-        else if (inst.opcode == "nand") {
+        } else if (inst.opcode == "nand") {
             op = 4;
             type = 0;
-        }
-        else if (inst.opcode == "addi") {
+        } else if (inst.opcode == "addi") {
             op = 5;
             type = 1;
-        }
-        else if (inst.opcode == "slti") {
+        } else if (inst.opcode == "slti") {
             op = 6;
             type = 1;
-        }
-        else if (inst.opcode == "ori") {
+        } else if (inst.opcode == "ori") {
             op = 7;
             type = 1;
-        }
-        else if (inst.opcode == "lui") {
+        } else if (inst.opcode == "lui") {
             op = 8;
             type = 1;
-        }
-        else if (inst.opcode == "lw") {
+        } else if (inst.opcode == "lw") {
             op = 9;
             type = 1;
-        }
-        else if (inst.opcode == "sw") {
+        } else if (inst.opcode == "sw") {
             op = 10;
             type = 1;
-        }
-        else if (inst.opcode == "beq") {
+        } else if (inst.opcode == "beq") {
             op = 11;
             type = 1;
-        }
-        else if (inst.opcode == "jalr") {
+        } else if (inst.opcode == "jalr") {
             op = 12;
             type = 1;
-        }
-        else if (inst.opcode == "j") {
+        } else if (inst.opcode == "j") {
             op = 13;
             type = 2;
-        }
-        else if (inst.opcode == "halt") {
+        } else if (inst.opcode == "halt") {
             op = 14;
             type = 2;
-        }
-        else {
+        } else {
             exit(1);
         }
 
