@@ -54,9 +54,10 @@ Instruction parse_line(const string &line) {
         clean = line;
     }
 
-    size_t start = clean.find_first_not_of(" \t\n\r");
-    if (start == string::npos) {
-        return inst;
+    int start = 0;
+    while (start < (int) clean.length() &&
+           (clean[start] == ' ' || clean[start] == '\t' || clean[start] == '\n' || clean[start] == '\r')) {
+        start++;
     }
     clean = clean.substr(start);
 
