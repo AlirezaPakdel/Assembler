@@ -120,7 +120,7 @@ Instruction parse_line(string &line) {
     return inst;
 }
 
-int findSymTabLen(FILE *inputFile) {
+int findLableNum(FILE *inputFile) {
     int count = 0;
     char buffer[256];
     while (fgets(buffer, sizeof(buffer), inputFile)) {  //ai
@@ -355,7 +355,7 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    int symLen = findSymTabLen(fin);
+    int symLen = findLableNum(fin);
     struct symbolTable *symT = (struct symbolTable *) malloc(symLen * sizeof(struct symbolTable));
     if (symLen > 0 && !symT) {
         cerr << "Error: Memory allocation failed" << endl;
