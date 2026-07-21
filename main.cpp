@@ -138,11 +138,13 @@ int fillSymTab(struct symbolTable *symT, FILE *inputFile) {
     int pc = 0;
     int idx = 0;
     char buffer[256];
-    while (fgets(buffer, sizeof(buffer), inputFile)) {
+    while (fgets(buffer, sizeof(buffer), inputFile)) { //ai help
         string line(buffer);
         Instruction inst = parse_line(line);
 
-        if (inst.opcode.empty() && inst.label.empty()) continue;
+        if (inst.opcode.empty() && inst.label.empty()) {
+            continue;
+        }
 
         if (!inst.label.empty()) {
             for (int i = 0; i < idx; i++) {
@@ -160,7 +162,7 @@ int fillSymTab(struct symbolTable *symT, FILE *inputFile) {
             if (inst.arg_count == 0 || !is_numeric(inst.args[0])) {
                 exit(1);
             }
-            pc += stoi(inst.args[0]);
+            pc += stoi(inst.args[0]); //string to int
         } else if (!inst.opcode.empty()) {
             pc++;
         }
