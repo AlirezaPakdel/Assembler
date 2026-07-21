@@ -17,7 +17,7 @@ struct Instruction {
     int arg_count;
 };
 
-bool is_numeric(const string &str) {
+bool is_numeric(string &str) {
     if (str.empty()) return false;
     int start = 0;
     if (str[0] == '-') {
@@ -42,13 +42,13 @@ int hex2int(char *hex) {
     return (int) strtol(hex, NULL, 16);
 }
 
-Instruction parse_line(const string &line) {
+Instruction parse_line(string &line) {
     Instruction inst;
     inst.arg_count = 0;
 
-    size_t comment_pos = line.find('#');
+    int comment_pos = line.find('#');
     string clean;
-    if (comment_pos != string::npos) {
+    if (comment_pos != -1) {
         clean = line.substr(0, comment_pos);
     } else {
         clean = line;
@@ -59,14 +59,20 @@ Instruction parse_line(const string &line) {
            (clean[start] == ' ' || clean[start] == '\t' || clean[start] == '\n' || clean[start] == '\r')) {
         start++;
     }
+
+    if (start == (int) clean.length()) {
+        return inst;
+    }
     clean = clean.substr(start);
 
-    size_t end = clean.find_last_not_of(" \t\n\r");
-    if (end != string::npos) {
-        clean = clean.substr(0, end + 1);
+    int end = clean.length() - 1;
+    while (clean[end] == ' ' || clean[end] == '\n' || clean[end] == '\t' || clean[end] == '\r') {
+        end--;
     }
 
-    for (size_t i = 0; i < clean.length(); ++i) {
+    clean = clean.substr(0, end + 1);
+
+    for (int i = 0; i < clean.length(); i++) {
         if (clean[i] == ',') clean[i] = ' ';
     }
 
@@ -117,10 +123,12 @@ Instruction parse_line(const string &line) {
 int findSymTabLen(FILE *inputFile) {
     int count = 0;
     char buffer[256];
-    while (fgets(buffer, sizeof(buffer), inputFile)) {
+    while (fgets(buffer, sizeof(buffer), inputFile)) {  //ai
         string line(buffer);
         Instruction inst = parse_line(line);
-        if (!inst.label.empty()) count++;
+        if (!inst.label.empty()) {
+            count++;
+        }
     }
     rewind(inputFile);
     return count;
