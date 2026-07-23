@@ -137,7 +137,7 @@ int fillSymTab(struct symbolTable *symT, FILE *inputFile) {
     int pc = 0;
     int idx = 0;
     char buffer[256];
-    while (fgets(buffer, sizeof(buffer), inputFile)) { //ai help
+    while (fgets(buffer, sizeof(buffer), inputFile)) {
         string line(buffer);
         Instruction inst = parse_line(line);
 
@@ -265,7 +265,9 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
         char hex_str[9] = "00000000";
 
         if (type == 0) {
-            if (inst.arg_count < 3) exit(1);
+            if (inst.arg_count < 3) {
+                exit(1);
+            }
             int rd = stoi(inst.args[0]);
             int rs = stoi(inst.args[1]);
             int rt = stoi(inst.args[2]);
@@ -286,7 +288,9 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
                     offset = stoi(inst.args[1]);
                 } else {
                     offset = get_symbol_address(symT, symLen, inst.args[1]);
-                    if (offset == -1) exit(1);
+                    if (offset == -1) {
+                        exit(1);
+                    }
                 }
             } else if (inst.opcode == "jalr") {
                 if (inst.arg_count >= 2) {
@@ -294,7 +298,9 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
                 }
                 offset = 0;
             } else {
-                if (inst.arg_count < 3) exit(1);
+                if (inst.arg_count < 3) {
+                    exit(1);
+                }
                 rs = stoi(inst.args[1]);
                 string target = inst.args[2];
                 if (is_numeric(target)) {
@@ -371,7 +377,6 @@ int main(int argc, char *argv[]) {
 
     fillSymTab(symT, fin);
     pass2(fin, fout, symT, symLen);
-
     cout << "Assembly completed successfully!" << endl;
     return 0;
 }
