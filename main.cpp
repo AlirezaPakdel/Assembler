@@ -1,9 +1,8 @@
-using namespace std;
-
 #include <iostream>
 #include <string>
 #include <cstring>
 
+using namespace std;
 
 struct symbolTable {
     char name[7];
@@ -78,7 +77,7 @@ Instruction parse_line(string &line) {
 
     char line_copy[256];
     strcpy(line_copy, clean.c_str());
-
+//-----------------------------------------------------
     char *tokens[6];
     int t_cnt = 0;
 
@@ -275,7 +274,9 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
             fprintf(outputFile, "%d\n", machine_code);
             pc++;
         } else if (type == 1) {
-            if (inst.arg_count < 2 && inst.opcode != "jalr") exit(1);
+            if (inst.arg_count < 2 && inst.opcode != "jalr") {
+                exit(1);
+            }
             int rt = stoi(inst.args[0]);
             int rs = 0;
             int offset = 0;
@@ -309,7 +310,9 @@ void pass2(FILE *inputFile, FILE *outputFile, struct symbolTable *symT, int symL
                 }
             }
 
-            if (offset < -32768 || offset > 65535) exit(1);
+            if (offset < -32768 || offset > 65535) {
+                exit(1);
+            }
             char lower[5];
             int2hex16(lower, offset);
             sprintf(hex_str, "0%X%X%X%s", op, rs, rt, lower);
@@ -368,10 +371,6 @@ int main(int argc, char *argv[]) {
 
     fillSymTab(symT, fin);
     pass2(fin, fout, symT, symLen);
-
-    free(symT);
-    fclose(fin);
-    fclose(fout);
 
     cout << "Assembly completed successfully!" << endl;
     return 0;

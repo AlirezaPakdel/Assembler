@@ -1,4 +1,9 @@
-addi 1, 0, 5
-addi 2, 0, 3
-add 3, 1, 2
-halt
+lw 1,0,five
+lw 2,1,2
+start add 1,1,2
+beq 0,1,done
+j start
+done halt
+five .fill 5
+neg1 .fill -1
+setAddr .fill start
